@@ -1,0 +1,8 @@
+name = Envato API
+description = Adds integration with the Envato Marketplace services.
+package = Envato
+core = 7.x
+
+files[] = envato.lib.php
+
+configure = admin/config/services/envato
