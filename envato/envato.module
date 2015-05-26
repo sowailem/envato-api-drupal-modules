@@ -1,6 +1,4 @@
 <?php
-
-<?php
 /**
  * @file
  * Provides API integration with the Envato market service.
