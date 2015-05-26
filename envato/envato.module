@@ -32,7 +32,6 @@ function envato_menu() {
     'description' => 'Envato accounts and settings.',
     'page callback' => 'envato_user_settings',
     'access arguments' => array('administer envato accounts'),
-    'file' => 'envato.pages.inc',
   );
 
   $items['admin/config/services/envato/default'] = array(
@@ -53,6 +52,10 @@ function envato_menu() {
   return $items;
 }
 
+function envato_user_settings(){
+  $form = array();
+  return $form;
+}
 
 /******************************************************/
 //
