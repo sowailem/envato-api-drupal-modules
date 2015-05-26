@@ -1,0 +1,95 @@
+<?php
+
+<?php
+/**
+ * @file
+ * Provides API integration with the Envato market service.
+ *
+ *
+ * @author Abdullah Sowailem <abdullah.sowailem@gmial.com>
+ */
+
+define ('ENVATO_HOST',         'http://envato.com');
+define ('ENVATO_API',          'https://api.envato.com');
+define ('ENVATO_APP_NAME',     'findability');
+define ('ENVATO_SEARCH',       'http://search.envato.com');
+define ('ENVATO_TINYURL',      'http://tinyurl.com');
+define('ENVATO_APP_REDIRECT_URI', 'envato/authentication');
+
+/**
+ * Implements hook_menu().
+ */
+function envato_menu() {
+  
+  $items['envato/authentication'] = array(
+    'title' => 'Envato Authentication',
+    'access callback' => TRUE,
+    'page callback' => 'envato_authentication_menu_callback',
+    'page arguments' => array(),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['admin/config/services/envato'] = array(
+    'title' => 'Envato',
+    'description' => 'Envato accounts and settings.',
+    'page callback' => 'envato_user_settings',
+    'access arguments' => array('administer envato accounts'),
+    'file' => 'envato.pages.inc',
+  );
+
+  $items['admin/config/services/envato/default'] = array(
+    'title' => 'Envato',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $items['admin/config/services/envato/settings'] = array(
+    'title' => 'Settings',
+    'description' => 'Envato settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('envato_admin_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'envato.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+
+/******************************************************/
+//
+/******************************************************/
+
+function envato_get_authorization(){
+
+  $envato = new Envato();
+
+  $redirect_uri = drupal_encode_path(url("envato/authentication", array('absolute' => TRUE)));
+   
+  $envato->get_authorization($redirect_uri);
+
+} 
+
+function envato_authentication_menu_callback(){
+    
+  $envato = new Envato();
+  
+  $code = $_GET['code'];
+
+  $redirect_uri               = drupal_encode_path(url("envato/authentication", array('absolute' => TRUE)));
+  $token                      = $envato->get_authentication($code, $redirect_uri);
+  
+  $envato->client_id          = variable_get('envato_client_id', '');
+  $envato->client_secret      = variable_get('envato_client_secret', '');
+  $envato->token              = $token;
+
+  //
+  module_invoke_all('envato_authentication', $envato);
+
+  
+  drupal_goto(url("<front>", array('absolute' => TRUE)));
+
+  return '';
+
+}
+
